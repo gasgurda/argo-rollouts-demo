@@ -1,0 +1,15 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: canary
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`canary`)
+    kind: Rule
+    services:
+    - name: traefik-service
+      namespace: default
+      kind: TraefikService

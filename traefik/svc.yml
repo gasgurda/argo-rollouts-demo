@@ -1,0 +1,27 @@
+---
+# The rollout-canary-preview service will point to the preview stack, making them reachable without
+# exposing them to production traffic.
+kind: Service
+apiVersion: v1
+metadata:
+  name: stable-rollout
+spec:
+  selector:
+    app: stable-rollout-pod
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: canary-rollout
+spec:
+  selector:
+    app: canary-rollout-pod
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080

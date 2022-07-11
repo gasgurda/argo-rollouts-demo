@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-demo
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      canaryService: rollouts-demo-canary
+      stableService: rollouts-demo-stable
+      trafficRouting:
+        smi: 
+         rootService: root-svc # optional
+         trafficSplitName: rollout-example-traffic-split # optional
+      steps:
+      - setWeight: 5
+      - pause: {}
+      - setWeight: 20
+      - pause: {duration: 20}
+      - setWeight: 40
+      - pause: {duration: 20}
+      - setWeight: 60
+      - pause: {duration: 20}
+      - setWeight: 80
+      - pause: {duration: 20}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: rollouts-demo
+  template:
+    metadata:
+      labels:
+        app: rollouts-demo
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: index
+          mountPath: "/usr/share/nginx/html"
+          readOnly: true
+      volumes:
+      - name: index
+        configMap:
+          name: cm2
+          items:
+          - key: "index.html"
+            path: "index.html"
